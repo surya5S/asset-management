@@ -1,6 +1,9 @@
 using System.Text;
+using AssetManagement.API.Middleware;
 using AssetManagement.Application.interfaces;
+using AssetManagement.Application.Interfaces;
 using AssetManagement.Infrastructure.Data;
+using AssetManagement.Application.Services;
 using AssetManagement.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +13,16 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database ───────────────────────────────────────────────
+// Fix PostgreSQL DateTime UTC requirement globally
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
-
+builder.Services.AddScoped<ICreditCardService, CreditCardService>();
+builder.Services.AddScoped<LoanCalculationService>();
+builder.Services.AddScoped<ILoanService, LoanService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 // ── Authentication (JWT) ───────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secret = jwtSettings["Secret"]!;
@@ -42,11 +50,15 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // ── CORS ───────────────────────────────────────────────────
+var allowedOrigins = builder.Configuration
+    .GetSection("AllowedOrigins")
+    .Get<string[]>() ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowClient", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -57,10 +69,12 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 var app = builder.Build();
 
 // ── Middleware Pipeline ────────────────────────────────────
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowClient");
 app.UseAuthentication();
 app.UseAuthorization();

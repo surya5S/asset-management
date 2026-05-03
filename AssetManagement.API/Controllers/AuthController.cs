@@ -9,10 +9,12 @@ namespace AssetManagement.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IWebHostEnvironment _env;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IWebHostEnvironment env)
     {
         _authService = authService;
+        _env         = env;
     }
 
     [HttpPost("register")]
@@ -70,11 +72,12 @@ public class AuthController : ControllerBase
 
     private void SetRefreshTokenCookie(string token)
     {
+        var isProd = _env.IsProduction();
         Response.Cookies.Append("refreshToken", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure   = false,
-            SameSite = SameSiteMode.Strict,
+            Secure   = isProd,
+            SameSite = isProd ? SameSiteMode.None : SameSiteMode.Strict,
             Expires  = DateTimeOffset.UtcNow.AddDays(7)
         });
     }
