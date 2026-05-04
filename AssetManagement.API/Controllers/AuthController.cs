@@ -62,7 +62,18 @@ public class AuthController : ControllerBase
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
     {
-        await _authService.ForgotPasswordAsync(dto.Email);
+        try
+        {
+            await _authService.ForgotPasswordAsync(dto.Email);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return StatusCode(503, new { message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(503, new { message = "Failed to send password reset email. Please try again later." });
+        }
         // Always return the same response to avoid leaking whether an email is registered
         return Ok(new { message = "If that email is registered, a reset link has been sent." });
     }
