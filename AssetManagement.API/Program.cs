@@ -50,9 +50,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // ── CORS ───────────────────────────────────────────────────
-var allowedOrigins = builder.Configuration
-    .GetSection("AllowedOrigins")
-    .Get<string[]>() ?? [];
+var corsEnv = Environment.GetEnvironmentVariable("CORS_ORIGINS");
+var allowedOrigins = corsEnv?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+    ?? [];
 
 builder.Services.AddCors(options =>
 {
