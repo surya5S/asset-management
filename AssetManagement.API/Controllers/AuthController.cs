@@ -55,7 +55,7 @@ public class AuthController : ControllerBase
             return Unauthorized("No refresh token.");
 
         var result = await _authService.RefreshTokenAsync(refreshToken);
-        SetRefreshTokenCookie(result.AccessToken);
+        SetRefreshTokenCookie(result.RefreshToken);
         return Ok(result);
     }
 

@@ -5,6 +5,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import api from "../api/axiosInstance";
 
 const AuthContext = createContext(null);
 
@@ -55,11 +56,17 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(userToStore));
   }, []);
 
-  const logout = useCallback(() => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
+  const logout = useCallback(async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // best-effort — clear local state regardless
+    } finally {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+    }
   }, []);
 
   const value = {
