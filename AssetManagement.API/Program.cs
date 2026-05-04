@@ -21,6 +21,7 @@ builder.Configuration.AddJsonFile(
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -97,16 +98,10 @@ using (var scope = app.Services.CreateScope())
     // Log email config state at startup to diagnose production issues
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    var es = cfg.GetSection("EmailSettings");
-    var smtpHost  = es["SmtpHost"];
-    var fromEmail = es["FromEmail"];
-    var username  = es["Username"];
-    var hasPassword = !string.IsNullOrEmpty(es["Password"]) && es["Password"] != "SET_VIA_ENVIRONMENT_VARIABLE";
-    var frontendUrl = cfg["AppSettings:FrontendUrl"];
+    var hasResendKey = !string.IsNullOrEmpty(cfg["Resend:ApiKey"]) && cfg["Resend:ApiKey"] != "SET_VIA_ENVIRONMENT_VARIABLE";
+    var frontendUrl  = cfg["AppSettings:FrontendUrl"];
 
-    logger.LogInformation(
-        "EmailSettings → SmtpHost={SmtpHost} FromEmail={FromEmail} Username={Username} HasPassword={HasPassword}",
-        smtpHost, fromEmail, username, hasPassword);
+    logger.LogInformation("Resend → HasApiKey={HasApiKey}", hasResendKey);
     logger.LogInformation("AppSettings → FrontendUrl={FrontendUrl}", frontendUrl);
 }
 
