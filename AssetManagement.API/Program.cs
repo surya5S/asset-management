@@ -93,6 +93,21 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
+
+    // Log email config state at startup to diagnose production issues
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var es = cfg.GetSection("EmailSettings");
+    var smtpHost  = es["SmtpHost"];
+    var fromEmail = es["FromEmail"];
+    var username  = es["Username"];
+    var hasPassword = !string.IsNullOrEmpty(es["Password"]) && es["Password"] != "SET_VIA_ENVIRONMENT_VARIABLE";
+    var frontendUrl = cfg["AppSettings:FrontendUrl"];
+
+    logger.LogInformation(
+        "EmailSettings → SmtpHost={SmtpHost} FromEmail={FromEmail} Username={Username} HasPassword={HasPassword}",
+        smtpHost, fromEmail, username, hasPassword);
+    logger.LogInformation("AppSettings → FrontendUrl={FrontendUrl}", frontendUrl);
 }
 
 app.Run();
