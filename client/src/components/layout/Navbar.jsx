@@ -49,13 +49,12 @@ export default function Navbar() {
             className="w-8 h-8 rounded-lg bg-primary-600 flex items-center
                           justify-center text-white font-bold text-sm"
           >
-            AM
+            FT
           </div>
           <span className="text-slate-100 font-semibold text-base hidden sm:block">
-            AssetManager
+            Your Personal Finance Tracker, Welcome Back.
           </span>
         </Link>
-
         {/* Nav Links — only when logged in */}
         {isAuthenticated && (
           <div className="hidden md:flex items-center gap-1">
@@ -99,16 +98,7 @@ export default function Navbar() {
                 <span className="hidden sm:block">Logout</span>
               </button>
             </>
-          ) : (
-            <>
-              <Link to="/login" className="btn-ghost text-sm">
-                Sign in
-              </Link>
-              <Link to="/register" className="btn-primary text-sm px-4 py-2">
-                Get started
-              </Link>
-            </>
-          )}
+          ) : null}
         </div>
       </div>
     </nav>

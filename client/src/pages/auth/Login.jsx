@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { loginApi } from "../../api/auth";
 import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
@@ -10,6 +11,7 @@ export default function Login() {
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -51,16 +53,35 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-400 block mb-1">Password</label>
-            <input
-              name="password"
-              type="password"
-              placeholder="Your password"
-              value={form.password}
-              onChange={handleChange}
-              className="input-field"
-              required
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-sm text-slate-400">Password</label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-primary-400 hover:text-primary-300"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Your password"
+                value={form.password}
+                onChange={handleChange}
+                className="input-field pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400
+                           hover:text-slate-200 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <button

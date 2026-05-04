@@ -3,18 +3,23 @@ using AssetManagement.Application.interfaces;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace AssetManagement.Infrastructure.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly AppDbContext _db;
-    private readonly IJwtService  _jwt;
+    private readonly AppDbContext  _db;
+    private readonly IJwtService   _jwt;
+    private readonly IEmailService _email;
+    private readonly IConfiguration _config;
 
-    public AuthService(AppDbContext db, IJwtService jwt)
+    public AuthService(AppDbContext db, IJwtService jwt, IEmailService email, IConfiguration config)
     {
-        _db  = db;
-        _jwt = jwt;
+        _db     = db;
+        _jwt    = jwt;
+        _email  = email;
+        _config = config;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -101,6 +106,40 @@ public class AuthService : IAuthService
             stored.RevokedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
         }
+    }
+
+    public async Task ForgotPasswordAsync(string email)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email.ToLower());
+        if (user == null || !user.IsActive) return; // silent — don't reveal whether email exists
+
+        var token = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+        user.PasswordResetToken        = token;
+        user.PasswordResetTokenExpiry  = DateTime.UtcNow.AddMinutes(15);
+        await _db.SaveChangesAsync();
+
+        var frontendUrl = _config["AppSettings:FrontendUrl"] ?? "http://localhost:5173";
+        var resetLink   = $"{frontendUrl}/reset-password?token={token}";
+        await _email.SendPasswordResetEmailAsync(user.Email, user.FullName, resetLink);
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        if (dto.NewPassword != dto.ConfirmPassword)
+            throw new InvalidOperationException("Passwords do not match.");
+
+        var user = await _db.Users.FirstOrDefaultAsync(u =>
+            u.PasswordResetToken == dto.Token &&
+            u.PasswordResetTokenExpiry > DateTime.UtcNow);
+
+        if (user == null)
+            throw new InvalidOperationException("Invalid or expired reset link.");
+
+        user.PasswordHash             = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        user.PasswordResetToken       = null;
+        user.PasswordResetTokenExpiry = null;
+        user.UpdatedAt                = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
     }
 
     private async Task<AuthResponseDto> BuildAuthResponse(User user)

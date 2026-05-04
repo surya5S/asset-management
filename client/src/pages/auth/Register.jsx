@@ -3,6 +3,34 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { registerApi } from "../../api/auth";
 import toast from "react-hot-toast";
+import { Eye, EyeOff, Info } from "lucide-react";
+
+function Tooltip({ text }) {
+  const [show, setShow] = useState(false);
+  return (
+    <span className="relative inline-flex items-center">
+      <Info
+        size={13}
+        className="text-slate-500 hover:text-slate-300 cursor-help ml-1.5 transition-colors"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      />
+      {show && (
+        <div
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20
+                     bg-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 w-52
+                     shadow-xl border border-slate-700 pointer-events-none"
+        >
+          {text}
+          <div
+            className="absolute top-full left-1/2 -translate-x-1/2
+                       border-4 border-transparent border-t-slate-800"
+          />
+        </div>
+      )}
+    </span>
+  );
+}
 
 export default function Register() {
   const { login } = useAuth();
@@ -15,6 +43,8 @@ export default function Register() {
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -33,7 +63,6 @@ export default function Register() {
       const res = await registerApi(form);
       login(res.data.user, res.data.accessToken);
       toast.success("Account created!");
-      toast.success("Navigating to Dashboard...");
       navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed.");
@@ -54,8 +83,9 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm text-slate-400 block mb-1">
+            <label className="text-sm text-slate-400 flex items-center mb-1">
               Full name
+              <Tooltip text="Your full name as it will appear in the app." />
             </label>
             <input
               name="fullName"
@@ -69,7 +99,10 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-400 block mb-1">Email</label>
+            <label className="text-sm text-slate-400 flex items-center mb-1">
+              Email
+              <Tooltip text="We'll send your password reset link to this address." />
+            </label>
             <input
               name="email"
               type="email"
@@ -82,33 +115,58 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="text-sm text-slate-400 block mb-1">
+            <label className="text-sm text-slate-400 flex items-center mb-1">
               Password
+              <Tooltip text="Minimum 8 characters. Use a mix of letters, numbers, and symbols for a stronger password." />
             </label>
-            <input
-              name="password"
-              type="password"
-              placeholder="Min 8 characters"
-              value={form.password}
-              onChange={handleChange}
-              className="input-field"
-              required
-            />
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Min 8 characters"
+                value={form.password}
+                onChange={handleChange}
+                className="input-field pr-10"
+                required
+                minLength={8}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400
+                           hover:text-slate-200 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <div>
-            <label className="text-sm text-slate-400 block mb-1">
+            <label className="text-sm text-slate-400 flex items-center mb-1">
               Confirm password
+              <Tooltip text="Must exactly match the password you entered above." />
             </label>
-            <input
-              name="confirmPassword"
-              type="password"
-              placeholder="Re-enter password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              className="input-field"
-              required
-            />
+            <div className="relative">
+              <input
+                name="confirmPassword"
+                type={showConfirm ? "text" : "password"}
+                placeholder="Re-enter password"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                className="input-field pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400
+                           hover:text-slate-200 transition-colors"
+                tabIndex={-1}
+              >
+                {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <button
@@ -130,37 +188,3 @@ export default function Register() {
     </div>
   );
 }
-
-/*
-  CONCEPTS IN THIS FILE:
-  ─────────────────────────────────────────────
-  1. Controlled Inputs            - `value={form.fullName}` + `onChange={handleChange}` makes
-                                    React the single source of truth for input values.
-                                    The DOM never leads — React state always drives the UI.
-  2. Single handleChange          - `[e.target.name]: e.target.value` uses computed property
-                                    names. One handler for all inputs — the `name` attribute
-                                    on each input maps to the matching key in state.
-  3. Spread + Override Pattern    - `{ ...prev, [key]: value }` spreads all existing state
-                                    then overrides just the changed field. State is immutable
-                                    — never mutate directly, always return a new object.
-  4. e.preventDefault()           - Stops the browser's default form submission (which would
-                                    reload the page). React handles submission via JS instead.
-  5. Client-side Validation       - Password match and PIN regex checked before the API call.
-                                    Saves a round trip and gives instant feedback. Server
-                                    still validates too — never trust only the client.
-  6. Regex Test (/^\d{4,6}$/)     - `^` = start, `\d` = digit, `{4,6}` = 4 to 6 times,
-                                    `$` = end. Ensures the whole string is 4–6 digits only.
-  7. loading state                - Disables the button and changes its text while the API
-                                    call is in flight. Prevents double-submission.
-  8. try/catch/finally            - finally always runs — setLoading(false) no matter if
-                                    the request succeeded or failed. Keeps UI consistent.
-  9. Optional chaining on error   - `err.response?.data?.message` safely navigates the
-                                    error object. Network errors have no `response` — without
-                                    `?.` this would throw a second error.
-  10. inputMode="numeric"         - On mobile, this shows the numeric keyboard for the PIN
-                                    field without restricting input type to number.
-  11. useNavigate                 - React Router's programmatic navigation hook. Redirects
-                                    to dashboard after successful registration.
-  12. toast notifications         - Global feedback system. Works from any component without
-                                    passing callbacks. Registered in main.jsx via <Toaster>.
-*/
