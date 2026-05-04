@@ -74,8 +74,8 @@ builder.Services.AddScoped<IExpenseService, ExpenseService>();
 var app = builder.Build();
 
 // ── Middleware Pipeline ────────────────────────────────────
-app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowClient");
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwagger();
