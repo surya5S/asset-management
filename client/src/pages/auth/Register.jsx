@@ -13,7 +13,6 @@ export default function Register() {
     email: "",
     password: "",
     confirmPassword: "",
-    pin: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -26,10 +25,6 @@ export default function Register() {
 
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match.");
-      return;
-    }
-    if (!/^\d{4,6}$/.test(form.pin)) {
-      toast.error("PIN must be 4–6 digits.");
       return;
     }
 
@@ -110,26 +105,6 @@ export default function Register() {
               type="password"
               placeholder="Re-enter password"
               value={form.confirmPassword}
-              onChange={handleChange}
-              className="input-field"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-slate-400 block mb-1">
-              PIN{" "}
-              <span className="text-surface-muted">
-                (4–6 digits, for recovery)
-              </span>
-            </label>
-            <input
-              name="pin"
-              type="password"
-              inputMode="numeric"
-              placeholder="••••••"
-              maxLength={6}
-              value={form.pin}
               onChange={handleChange}
               className="input-field"
               required

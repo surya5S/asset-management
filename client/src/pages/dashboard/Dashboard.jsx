@@ -29,15 +29,15 @@ import {
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const T = {
-  pageBg: "#f0eef8",
-  cardBg: "#ffffff",
-  cardBorder: "2px solid #7c3aed",
-  cardBorderMuted: "2px solid #c4b5fd",
-  cardBorderMaroon: "2px solid #9f1239",
+  pageBg: "#0d0d14",
+  cardBg: "#13111f",
+  cardBorder: "2px solid #3d2d7a",
+  cardBorderMuted: "2px solid #2a2040",
+  cardBorderMaroon: "2px solid #7f1d3f",
   cardRadius: 14,
-  cardShadow: "0 4px 16px rgba(109,40,217,0.10)",
-  sectionDivider: "2px solid #ede9fe",
-  labelColor: "#7c3aed",
+  cardShadow: "0 4px 24px rgba(0,0,0,0.5)",
+  sectionDivider: "1px solid #2a2040",
+  labelColor: "#a78bfa",
 };
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -85,22 +85,22 @@ const ChartTooltip = ({ active, payload, label, formatter }) => {
   return (
     <div
       style={{
-        background: "#fff",
+        background: "#1a1830",
         border: "2px solid #7c3aed",
         borderRadius: 10,
         padding: "8px 14px",
         fontSize: 12,
-        boxShadow: "0 8px 24px rgba(109,40,217,0.15)",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
       }}
     >
-      <p style={{ color: "#7c3aed", margin: "0 0 4px", fontWeight: 600 }}>
+      <p style={{ color: "#a78bfa", margin: "0 0 4px", fontWeight: 600 }}>
         {label}
       </p>
       {payload.map((p, i) => (
         <p
           key={i}
           style={{
-            color: p.color || "#0f172a",
+            color: p.color || "#e2e8f0",
             fontWeight: 700,
             margin: "2px 0",
           }}
@@ -169,14 +169,14 @@ export default function Dashboard() {
   const overdueDues = emiDues?.filter((d) => d.isOverdue) ?? [];
 
   return (
-    <div style={{ minHeight: "100vh", background: T.pageBg, color: "#0f172a" }}>
+    <div style={{ minHeight: "100vh", background: T.pageBg, color: "#e2e8f0" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.45;} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
         .dash-card { animation: fadeUp 0.3s ease both; }
         .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(109,40,217,0.2) !important; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.6) !important; }
       `}</style>
 
       <div
@@ -204,7 +204,7 @@ export default function Dashboard() {
               style={{
                 fontSize: 24,
                 fontWeight: 800,
-                color: "#3b0764",
+                color: "#e2e8f0",
                 margin: 0,
                 letterSpacing: "-0.02em",
               }}
@@ -214,7 +214,7 @@ export default function Dashboard() {
             <p
               style={{
                 fontSize: 13,
-                color: "#7c3aed",
+                color: "#a78bfa",
                 margin: "3px 0 0",
                 fontWeight: 500,
               }}
@@ -231,12 +231,12 @@ export default function Dashboard() {
           <div
             style={{
               display: "flex",
-              background: "#fff",
+              background: "#1a1830",
               borderRadius: 12,
               padding: 4,
               gap: 3,
-              border: "2px solid #7c3aed",
-              boxShadow: "0 2px 8px rgba(109,40,217,0.12)",
+              border: "2px solid #3d2d7a",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
             }}
           >
             {PERIODS.map((p) => (
@@ -255,10 +255,10 @@ export default function Dashboard() {
                     period === p.value
                       ? "linear-gradient(135deg,#7c3aed,#6d28d9)"
                       : "transparent",
-                  color: period === p.value ? "#ffffff" : "#7c3aed",
+                  color: period === p.value ? "#ffffff" : "#a78bfa",
                   boxShadow:
                     period === p.value
-                      ? "0 2px 8px rgba(109,40,217,0.3)"
+                      ? "0 2px 8px rgba(109,40,217,0.4)"
                       : "none",
                 }}
               >
@@ -372,22 +372,22 @@ export default function Dashboard() {
           }}
         >
           <StatCard
-            icon={<Wallet size={15} color="#7c3aed" />}
-            iconBg="linear-gradient(135deg,#ede9fe,#ddd6fe)"
-            iconBorder="1px solid #c4b5fd"
+            icon={<Wallet size={15} color="#a78bfa" />}
+            iconBg="linear-gradient(135deg,#2a1f4a,#1e1640)"
+            iconBorder="1px solid #4c3a8a"
             label="This Month's Spend"
             value={fmt(summaryCards?.monthlySpend)}
-            borderColor="#7c3aed"
+            borderColor="#3d2d7a"
           />
           <StatCard
-            icon={<Landmark size={15} color="#9f1239" />}
-            iconBg="linear-gradient(135deg,#fff1f2,#ffe4e6)"
-            iconBorder="1px solid #fda4af"
+            icon={<Landmark size={15} color="#fda4af" />}
+            iconBg="linear-gradient(135deg,#2d0a14,#3d0f1e)"
+            iconBorder="1px solid #7f1d3f"
             label="Loan Outstanding"
             value={fmt(summaryCards?.totalLoanOutstanding)}
-            valueColor="#9f1239"
+            valueColor="#fda4af"
             sub={`${summaryCards?.activeLoans} active loan${summaryCards?.activeLoans !== 1 ? "s" : ""}`}
-            borderColor="#9f1239"
+            borderColor="#7f1d3f"
           />
           <StatCard
             icon={
@@ -396,34 +396,24 @@ export default function Dashboard() {
                 color={utilizationColor(summaryCards?.cardUtilizationPercent)}
               />
             }
-            iconBg={
-              summaryCards?.cardUtilizationPercent > 70
-                ? "linear-gradient(135deg,#fff1f2,#ffe4e6)"
-                : summaryCards?.cardUtilizationPercent > 40
-                  ? "linear-gradient(135deg,#fffbeb,#fef3c7)"
-                  : "linear-gradient(135deg,#ecfdf5,#d1fae5)"
-            }
-            iconBorder={
-              summaryCards?.cardUtilizationPercent > 70
-                ? "1px solid #fda4af"
-                : "1px solid #a7f3d0"
-            }
+            iconBg="linear-gradient(135deg,#1e1640,#2a1f4a)"
+            iconBorder="1px solid #4c3a8a"
             label="Card Utilization"
             value={`${summaryCards?.cardUtilizationPercent ?? 0}%`}
             valueColor={utilizationColor(summaryCards?.cardUtilizationPercent)}
             sub={`${fmt(summaryCards?.totalCardBalance)} / ${fmt(summaryCards?.totalCreditLimit)}`}
             borderColor={
-              summaryCards?.cardUtilizationPercent > 70 ? "#9f1239" : "#7c3aed"
+              summaryCards?.cardUtilizationPercent > 70 ? "#7f1d3f" : "#3d2d7a"
             }
           />
           <StatCard
-            icon={<TrendingDown size={15} color="#059669" />}
-            iconBg="linear-gradient(135deg,#ecfdf5,#d1fae5)"
-            iconBorder="1px solid #6ee7b7"
+            icon={<TrendingDown size={15} color="#34d399" />}
+            iconBg="linear-gradient(135deg,#022c22,#064e3b)"
+            iconBorder="1px solid #059669"
             label="Active Loans"
             value={summaryCards?.activeLoans ?? 0}
             sub="currently tracking"
-            borderColor="#7c3aed"
+            borderColor="#3d2d7a"
           />
         </div>
 
@@ -445,9 +435,9 @@ export default function Dashboard() {
                     padding: "10px 16px",
                     marginBottom: 14,
                     fontSize: 13,
-                    color: "#9f1239",
-                    background: "#fff1f2",
-                    border: "2px solid #fda4af",
+                    color: "#fda4af",
+                    background: "#2d0a14",
+                    border: "2px solid #7f1d3f",
                     borderRadius: 10,
                     fontWeight: 600,
                   }}
@@ -598,7 +588,7 @@ export default function Dashboard() {
                         <span
                           style={{
                             fontSize: 12,
-                            color: "#4c1d95",
+                            color: "#cbd5e1",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
@@ -619,13 +609,13 @@ export default function Dashboard() {
                         <span
                           style={{
                             fontSize: 12,
-                            color: "#3b0764",
+                            color: "#e2e8f0",
                             fontWeight: 700,
                           }}
                         >
                           {c.percentage}%
                         </span>
-                        <span style={{ fontSize: 11, color: "#7c3aed" }}>
+                        <span style={{ fontSize: 11, color: "#a78bfa" }}>
                           {fmtCompact(c.amount)}
                         </span>
                       </div>
@@ -712,10 +702,10 @@ export default function Dashboard() {
                   const col = utilizationColor(card.utilizationPercent);
                   const trackBg =
                     card.utilizationPercent > 70
-                      ? "#fff1f2"
+                      ? "#2d0a14"
                       : card.utilizationPercent > 40
-                        ? "#fffbeb"
-                        : "#ecfdf5";
+                        ? "#1c1408"
+                        : "#022c22";
                   const pct = Math.min(100, card.utilizationPercent);
                   return (
                     <div key={card.cardId}>
@@ -730,14 +720,14 @@ export default function Dashboard() {
                         <span
                           style={{
                             fontSize: 13,
-                            color: "#3b0764",
+                            color: "#e2e8f0",
                             fontWeight: 600,
                           }}
                         >
                           {card.bankName}
                           <span
                             style={{
-                              color: "#7c3aed",
+                              color: "#a78bfa",
                               marginLeft: 5,
                               fontWeight: 400,
                             }}
@@ -752,7 +742,7 @@ export default function Dashboard() {
                             gap: 10,
                           }}
                         >
-                          <span style={{ fontSize: 11, color: "#7c3aed" }}>
+                          <span style={{ fontSize: 11, color: "#a78bfa" }}>
                             {fmt(card.currentBalance)} / {fmt(card.creditLimit)}
                           </span>
                           <span
@@ -810,8 +800,8 @@ export default function Dashboard() {
         <div
           className="dash-card"
           style={{
-            background: "#ffffff",
-            border: "2px solid #7c3aed",
+            background: T.cardBg,
+            border: T.cardBorder,
             borderRadius: T.cardRadius,
             padding: "20px 22px",
             boxShadow: T.cardShadow,
@@ -846,7 +836,7 @@ export default function Dashboard() {
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: "#4c1d95",
+                  color: "#a78bfa",
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
                 }}
@@ -909,10 +899,10 @@ export default function Dashboard() {
                   key={i}
                   style={{
                     height: 58,
-                    background: "#f5f3ff",
+                    background: "#1e1a30",
                     borderRadius: 10,
                     animation: "pulse 1.5s ease infinite",
-                    border: "1px solid #ddd6fe",
+                    border: "1px solid #3d2d7a",
                   }}
                 />
               ))}
@@ -931,19 +921,19 @@ export default function Dashboard() {
                 <div
                   key={i}
                   style={{
-                    background: "#faf9ff",
-                    border: "2px solid #c4b5fd",
+                    background: "#1a1830",
+                    border: "1px solid #3d2d7a",
                     borderRadius: 12,
                     padding: "16px 18px",
                     borderTop: `3px solid ${PALETTE[i % PALETTE.length]}`,
-                    boxShadow: "0 2px 8px rgba(109,40,217,0.08)",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.4)",
                   }}
                 >
                   <p
                     style={{
                       fontSize: 13,
                       fontWeight: 700,
-                      color: "#3b0764",
+                      color: "#e2e8f0",
                       margin: "0 0 6px",
                     }}
                   >
@@ -952,7 +942,7 @@ export default function Dashboard() {
                   <p
                     style={{
                       fontSize: 12,
-                      color: "#6d28d9",
+                      color: "#a78bfa",
                       margin: 0,
                       lineHeight: 1.7,
                     }}
@@ -1022,8 +1012,8 @@ function StatCard({
     <div
       className="stat-card"
       style={{
-        background: "#ffffff",
-        border: `2px solid ${borderColor ?? "#7c3aed"}`,
+        background: T.cardBg,
+        border: `2px solid ${borderColor ?? "#3d2d7a"}`,
         borderRadius: 13,
         padding: "18px 20px",
         boxShadow: T.cardShadow,
@@ -1037,7 +1027,7 @@ function StatCard({
           gap: 10,
           marginBottom: 14,
           paddingBottom: 12,
-          borderBottom: "1px solid #ede9fe",
+          borderBottom: "1px solid #2a2040",
         }}
       >
         <div
@@ -1058,7 +1048,7 @@ function StatCard({
         <span
           style={{
             fontSize: 11,
-            color: "#7c3aed",
+            color: "#a78bfa",
             fontWeight: 700,
             textTransform: "uppercase",
             letterSpacing: "0.07em",
@@ -1071,7 +1061,7 @@ function StatCard({
         style={{
           fontSize: 26,
           fontWeight: 800,
-          color: valueColor ?? "#3b0764",
+          color: valueColor ?? "#e2e8f0",
           margin: "0 0 4px",
           letterSpacing: "-0.02em",
         }}
@@ -1080,7 +1070,7 @@ function StatCard({
       </p>
       {sub && (
         <p
-          style={{ fontSize: 11, color: "#a78bfa", margin: 0, fontWeight: 500 }}
+          style={{ fontSize: 11, color: "#64748b", margin: 0, fontWeight: 500 }}
         >
           {sub}
         </p>
@@ -1094,11 +1084,11 @@ function DueCard({ due }) {
   return (
     <div
       style={{
-        background: overdue ? "#fff1f2" : "#faf9ff",
-        border: `2px solid ${overdue ? "#9f1239" : "#7c3aed"}`,
+        background: overdue ? "#1a0a10" : T.cardBg,
+        border: `2px solid ${overdue ? "#7f1d3f" : "#3d2d7a"}`,
         borderRadius: 13,
         padding: "16px 18px",
-        boxShadow: overdue ? "0 4px 16px rgba(159,18,57,0.12)" : T.cardShadow,
+        boxShadow: T.cardShadow,
       }}
     >
       <div
@@ -1108,7 +1098,7 @@ function DueCard({ due }) {
           alignItems: "flex-start",
           marginBottom: 10,
           paddingBottom: 10,
-          borderBottom: `1px solid ${overdue ? "#fda4af" : "#ddd6fe"}`,
+          borderBottom: `1px solid ${overdue ? "#4d1528" : "#2a2040"}`,
         }}
       >
         <div>
@@ -1116,23 +1106,23 @@ function DueCard({ due }) {
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: overdue ? "#9f1239" : "#3b0764",
+              color: overdue ? "#fda4af" : "#e2e8f0",
               margin: 0,
             }}
           >
             {due.loanName}
           </p>
-          <p style={{ fontSize: 11, color: "#7c3aed", margin: "3px 0 0" }}>
+          <p style={{ fontSize: 11, color: "#a78bfa", margin: "3px 0 0" }}>
             {due.lenderName}
           </p>
         </div>
-        {overdue && <AlertTriangle size={14} color="#9f1239" />}
+        {overdue && <AlertTriangle size={14} color="#fda4af" />}
       </div>
       <p
         style={{
           fontSize: 26,
           fontWeight: 800,
-          color: overdue ? "#9f1239" : "#3b0764",
+          color: overdue ? "#fda4af" : "#e2e8f0",
           margin: "0 0 12px",
           letterSpacing: "-0.02em",
         }}
@@ -1152,11 +1142,11 @@ function DueCard({ due }) {
             fontWeight: 700,
             padding: "4px 10px",
             borderRadius: 6,
-            background: due.isInBufferPeriod ? "#fef3c7" : "#ede9fe",
-            color: due.isInBufferPeriod ? "#d97706" : "#6d28d9",
+            background: due.isInBufferPeriod ? "#1c1408" : "#1e1640",
+            color: due.isInBufferPeriod ? "#fbbf24" : "#a78bfa",
             border: due.isInBufferPeriod
-              ? "1px solid #fde68a"
-              : "1px solid #c4b5fd",
+              ? "1px solid #78350f"
+              : "1px solid #4c3a8a",
           }}
         >
           {due.dueLabel}
@@ -1164,7 +1154,7 @@ function DueCard({ due }) {
         <span
           style={{
             fontSize: 11,
-            color: overdue ? "#9f1239" : "#7c3aed",
+            color: overdue ? "#fda4af" : "#a78bfa",
             fontWeight: overdue ? 700 : 500,
           }}
         >
@@ -1213,7 +1203,7 @@ function Empty({ icon, msg, small }) {
       }}
     >
       {icon}
-      <p style={{ fontSize: 13, color: "#a78bfa", margin: 0, fontWeight: 500 }}>
+      <p style={{ fontSize: 13, color: "#64748b", margin: 0, fontWeight: 500 }}>
         {msg}
       </p>
     </div>
@@ -1239,7 +1229,7 @@ function Skeleton() {
             key={i}
             style={{
               height: h,
-              background: "#ddd6fe",
+              background: "#1e1a30",
               borderRadius: 14,
               animation: "pulse 1.5s ease infinite",
               animationDelay: `${i * 0.08}s`,

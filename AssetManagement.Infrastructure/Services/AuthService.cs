@@ -22,9 +22,6 @@ public class AuthService : IAuthService
         if (dto.Password != dto.ConfirmPassword)
             throw new InvalidOperationException("Passwords do not match.");
 
-        if (dto.Pin.Length < 4 || dto.Pin.Length > 6 || !dto.Pin.All(char.IsDigit))
-            throw new InvalidOperationException("PIN must be 4–6 digits.");
-
         var exists = await _db.Users.AnyAsync(u => u.Email == dto.Email.ToLower());
         if (exists)
             throw new InvalidOperationException("Email already registered.");
@@ -34,7 +31,7 @@ public class AuthService : IAuthService
             FullName     = dto.FullName.Trim(),
             Email        = dto.Email.ToLower().Trim(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            PinHash      = BCrypt.Net.BCrypt.HashPassword(dto.Pin),
+            PinHash      = BCrypt.Net.BCrypt.HashPassword(dto.Pin ?? string.Empty),
         };
 
         _db.Users.Add(user);
@@ -54,10 +51,7 @@ public class AuthService : IAuthService
         var validPassword = !string.IsNullOrEmpty(dto.Password) &&
                              BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
 
-        var validPin = !string.IsNullOrEmpty(dto.Pin) &&
-                        BCrypt.Net.BCrypt.Verify(dto.Pin, user.PinHash);
-
-        if (!validPassword && !validPin)
+        if (!validPassword)
             throw new UnauthorizedAccessException("Invalid credentials.");
 
         return await BuildAuthResponse(user);
